@@ -1,0 +1,39 @@
+import requests
+import sys
+import re
+
+
+def main():
+        results=[]
+        r = requests.get('https://api.github.com/search/code?q=' + sys.argv[1] + '+in:file', auth=('username', 'pwd'))
+        seen = read("out.txt")
+        for i in range(len(r.json()["items"])):
+                #print r.json()["items"][i]["html_url"]
+                file_found = r.json()["items"][i]["html_url"]
+                #print file_found
+                if file_found not in seen:
+                        print "entered if"
+                        results.append(file_found)
+        if len(results) != 0:
+                write("out.txt",results)
+        print results
+
+
+def write(filename, data):
+        myfile = open(filename, 'a')
+        myfile.write(str(data))
+        myfile.close()
+
+
+def read(filename):
+        myfile = open(filename, "r")
+        f = myfile.read()
+        myfile.close()
+        return f
+
+def parse_list(str_list):
+        list = re.sub("[\[\]\,']", '', str_list).split(" u")
+        list[0] = re.sub("uhttps", 'https', list[0])
+        return list
+
+main()
